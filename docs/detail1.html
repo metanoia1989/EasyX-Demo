@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Page 1</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 引入 Prism.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css" rel="stylesheet">
+    <style>
+        .code-container {
+            margin-top: 20px;
+            overflow-x: auto; /* 使代码示例容器可水平滚动 */
+        }
+        .canvas-container {
+            overflow-x: auto; /* 使 Canvas 容器可水平滚动 */
+        }
+        canvas {
+            border: 1px solid #000;
+            display: block; /* 确保 canvas 是块级元素 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5 mb-5">
+        <h1>范例 1</h1>
+        <p>这里是范例 1 的详细内容。</p>
+        <div class="mb-3">
+            <a href="index.html" class="btn btn-primary">返回目录</a>
+        </div>
+        
+        <div class="canvas-box mb-4">
+            <h2>Canvas 操作效果</h2>
+            <div class="canvas-container">
+                <canvas id="myCanvas"></canvas>
+            </div>
+        </div>
+        
+        <h2>代码示例</h2>
+        <pre class="code-container"><code class="language-javascript" id="codeBlock"></code></pre>
+        
+    </div>
+    
+    <!-- 引入 Bootstrap JS 和依赖 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcd.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- 引入 Prism.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-javascript.min.js"></script>
+    
+    <!-- JS代码 -->
+    <script id="exampleScript" type="text/javascript">
+        // 获取 canvas 元素
+        const canvas = document.getElementById('myCanvas');
+        canvas.width = 400;  
+        canvas.height = 400; 
+        const ctx = canvas.getContext('2d');
+        
+        // 绘制矩形
+        ctx.fillStyle = 'red';
+        ctx.fillRect(50, 50, 150, 100);
+        
+        // 绘制圆形
+        ctx.beginPath();
+        ctx.arc(200, 200, 50, 0, Math.PI * 2, true);
+        ctx.fillStyle = 'blue';
+        ctx.fill();
+    </script>
+    
+    <!-- 动态读取 script 代码并显示 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const scriptElement = document.getElementById('exampleScript');
+            const codeBlock = document.getElementById('codeBlock');
+
+            // 获取 script 标签中的代码并设置到 codeBlock 中
+            codeBlock.textContent = scriptElement.textContent.trim();
+            
+            // 重新渲染代码高亮
+            Prism.highlightElement(codeBlock);
+        });
+    </script>
+</body>
+</html>
