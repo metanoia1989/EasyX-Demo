@@ -9,3 +9,5 @@ EasyX 是针对 C++ 的图形库，可以帮助 C/C++ 初学者快速上手图�
 Mac环境装不了这个 EasyX，这个库是专门针对 Windows   
 
 所以也不用装，HTML5的图形绘制已经足够优秀了，直接用 Canvas 来移植就行。 
+
+在线访问地址 https://metanoia1989.github.io/EasyX-Demo/ 

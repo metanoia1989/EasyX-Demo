@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyX 范例 桃树</title>
     <!-- 引入 Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.css">
     <!-- 引入 Prism.js CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css" rel="stylesheet">
+     <link rel="stylesheet" href="assets/prism/prism.min.css">
     <style>
         .code-container {
             margin-top: 20px;
@@ -43,30 +43,107 @@
     </div>
     
     <!-- 引入 Bootstrap JS 和依赖 -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcd.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="assets/bootstrap/jquery-3.5.1.slim.min.js"></script>
+    <script src="assets/bootstrap/popper.min.js"></script>
+    <script src="assets/bootstrap/bootstrap.min.js"></script>
     <!-- 引入 Prism.js JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-javascript.min.js"></script>
-    
+    <script src="assets/prism/prism.min.js"></script>
+    <script src="assets/prism/prism-javascript.min.js"></script>
+    <script src="assets/js/functions.js"></script>
     <!-- JS代码 -->
     <script id="exampleScript" type="text/javascript">
         // 获取 canvas 元素
+        const TREE_WIDTH = 800;
+        const TREE_HEIGHT = 600;
         const canvas = document.getElementById('myCanvas');
-        canvas.width = 400;  
-        canvas.height = 400; 
+        canvas.width = TREE_WIDTH;  
+        canvas.height = TREE_HEIGHT; 
         const ctx = canvas.getContext('2d');
+
+        // 设置canvas背景颜色为空白 
+        const bgColor = '#ffffff';
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // 绘制矩形
-        ctx.fillStyle = 'red';
-        ctx.fillRect(50, 50, 150, 100);
-        
-        // 绘制圆形
-        ctx.beginPath();
-        ctx.arc(200, 200, 50, 0, Math.PI * 2, true);
-        ctx.fillStyle = 'blue';
-        ctx.fill();
+        drawPeachTree()
+    
+        function drawPeachTree() {
+            // 定义绘制桃树的基本数据  
+            const OFF_SET = [
+                -Math.PI / 6, // 30度
+                -Math.PI / 16, // 11.25度
+                Math.PI / 16, // 11.25度
+                Math.PI / 6, // 30度
+            ];
+
+            const LENGTH = [ 0.75, 0.95, 0.95, 0.75 ];
+
+            const queue = [
+                {
+                    x: TREE_WIDTH / 2, 
+                    y: TREE_HEIGHT,
+                    length: 100, // 长度 
+                    radians: - Math.PI / 2, // 角度 
+                    thickness: 8, // 厚度 
+                    level: 1, // 颜色明度 
+                }
+            ];
+
+
+
+            function draw() {
+                if (queue.length === 0) {
+                    return; // 如果队列为空，停止绘制
+                }
+
+                let branch = queue.shift();
+
+                let dx = Math.cos(branch.radians); // x 方向偏移量 
+                let dy = Math.sin(branch.radians); // y 方向偏移量 
+                let x_end = branch.x + branch.length * dx; // 结束点 x 坐标
+                let y_end = branch.y + branch.length * dy; // 结束点 y 坐标
+
+                // 绘制树干和树枝 
+                ctx.beginPath();
+                ctx.moveTo(branch.x, branch.y);
+                ctx.lineTo(x_end, y_end);
+                ctx.lineWidth = branch.thickness; // 线宽
+                ctx.strokeStyle = HSVtoRGB(15, 0.75, 0.4 + branch.level * 0.05); 
+                ctx.stroke(); // 开始绘制 
+
+                if (branch.thickness > 2) { // 厚度大于2，绘制树干 
+                    for (let i = 0; i < 4; i++) {
+                        queue.push({
+                            x: x_end, 
+                            y: y_end, 
+                            length: branch.length * LENGTH[i], 
+                            radians: branch.radians + OFF_SET[i], 
+                            thickness: branch.thickness * 0.75, 
+                            level: branch.level + 1, 
+                        });
+                    }
+                } else { // 绘制树叶 
+                    // 计算偏移量 (dx, dy) 的欧几里得距离，使用 min(15.f, ...) 将这个距离限制在 15 以内。
+                    // 用 16 减去这个距离，得到一个从 1 到 16 的值，最后除以 16，将其归一化到 [0, 1] 之间 
+                    // 根据距离中心点的远近（距离越近，半径越大），确定叶子的大小。
+                    // 这样可以确保树叶的大小随位置变化而变化，中心附近的叶子较大，远离中心的叶子较小。
+                    let r = (16 - Math.min(15, Math.sqrt(dx*dx + dy*dy))) / 16
+                    dx = randomNum(-16, 16), dy = randomNum(-16, 16); // 偏移量  
+
+                    ctx.beginPath();
+                    let color = HSVtoRGB(randomNum(0, 0.1), randomNum(0.2, 0.5), randomNum(0.8, 0.9)); 
+                    ctx.strokeStyle = color;
+                    ctx.fillStyle = color;
+                    ctx.arc(x_end+dx, y_end+dy, Math.max(r*5, 1), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                requestAnimationFrame(draw);
+            }
+
+            requestAnimationFrame(draw);
+        }
+
     </script>
     
     <!-- 动态读取 script 代码并显示 -->
